@@ -13,8 +13,8 @@ services:
     cap_add:
       - MKNOD
     environment:
-      - aliasgroup1=http://umbrel.local:8081,http://IP_LAN_DO_SERVIDOR:8081,http://IP_TAILSCALE_DO_SERVIDOR:8081
+      - aliasgroup1=http://192.168.1.207:8081,http://umbrel.local:8081
       - username=admin
-      - password=TroqueEssaSenha
+      - password=admin
       - extra_params=--o:ssl.enable=false --o:ssl.termination=false
       - dictionaries=pt_BR en_US

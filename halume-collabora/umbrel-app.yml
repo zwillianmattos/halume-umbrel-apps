@@ -1,20 +1,23 @@
-version: "3.7"
-
-services:
-  app_proxy:
-    environment:
-      APP_HOST: halume-collabora_web_1
-      APP_PORT: 9980
-      PROXY_AUTH_ADD: "false"
-
-  web:
-    image: collabora/code:latest
-    restart: unless-stopped
-    cap_add:
-      - MKNOD
-    environment:
-      - aliasgroup1=http://192.168.1.207:8081,http://umbrel.local:8081
-      - username=admin
-      - password=admin
-      - extra_params=--o:ssl.enable=false --o:ssl.termination=false
-      - dictionaries=pt_BR en_US
+manifestVersion: 1
+id: halume-collabora
+category: files
+name: Halume Suite
+version: "latest"
+tagline: Editor de documentos online para o Nextcloud
+description: >-
+  Collabora Online Development Edition (CODE). Edite documentos, planilhas e
+  apresentações direto no navegador, integrado ao Nextcloud.
+developer: Collabora
+website: https://www.collaboraonline.com
+dependencies: []
+repo: https://github.com/CollaboraOnline/online
+support: https://forum.collaboraonline.com
+port: 9980
+gallery: []
+path: "/browser/dist/admin/admin.html"
+defaultUsername: "admin"
+defaultPassword: "TroqueEssaSenha"
+icon: https://raw.githubusercontent.com/zwillianmattos/halume-umbrel-apps/master/halume-collabora/icon.png
+submitter: Halume
+submission: ""
+releaseNotes: ""
