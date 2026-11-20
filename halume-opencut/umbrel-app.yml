@@ -1,0 +1,24 @@
+manifestVersion: 1
+id: halume-opencut
+category: media
+name: OpenCut
+version: "cf5e79e"
+tagline: Editor de vídeo no navegador, alternativa ao CapCut
+description: >-
+  OpenCut é um editor de vídeo open source que roda no navegador. Timeline com
+  várias faixas, textos, legendas automáticas com Whisper e exportação de
+  vídeos para reels e stories.
+developer: OpenCut
+website: https://opencut.app
+dependencies: []
+repo: https://github.com/OpenCut-app/opencut-classic
+support: https://github.com/OpenCut-app/opencut-classic/issues
+port: 8462
+gallery: []
+path: ""
+defaultUsername: ""
+defaultPassword: ""
+icon: https://raw.githubusercontent.com/zwillianmattos/halume-umbrel-apps/master/halume-opencut/icon.png
+submitter: Halume
+submission: ""
+releaseNotes: ""

@@ -17,7 +17,7 @@ gallery: []
 path: "/browser/dist/admin/admin.html"
 defaultUsername: "admin"
 defaultPassword: "TroqueEssaSenha"
-icon: https://raw.githubusercontent.com/SEU_USUARIO/halume-umbrel-apps/master/halume-collabora/icon.png
+icon: https://raw.githubusercontent.com/zwillianmattos/halume-umbrel-apps/master/halume-collabora/icon.png
 submitter: Halume
 submission: ""
 releaseNotes: ""

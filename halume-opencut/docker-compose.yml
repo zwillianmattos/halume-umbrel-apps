@@ -1,0 +1,64 @@
+version: "3.7"
+
+services:
+  app_proxy:
+    environment:
+      APP_HOST: halume-opencut_web_1
+      APP_PORT: 3000
+      PROXY_AUTH_ADD: "false"
+
+  db:
+    image: postgres:17
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: opencut
+      POSTGRES_PASSWORD: ${APP_SEED}
+      POSTGRES_DB: opencut
+    volumes:
+      - ${APP_DATA_DIR}/data/postgres:/var/lib/postgresql/data
+      - ${APP_DATA_DIR}/migrations:/docker-entrypoint-initdb.d:ro
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U opencut"]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+
+  redis:
+    image: redis:7-alpine
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+
+  redis-http:
+    image: hiett/serverless-redis-http:latest
+    restart: unless-stopped
+    environment:
+      SRH_MODE: env
+      SRH_TOKEN: ${APP_SEED}
+      SRH_CONNECTION_STRING: redis://halume-opencut_redis_1:6379
+    depends_on:
+      redis:
+        condition: service_healthy
+
+  web:
+    image: ghcr.io/zwillianmattos/halume-opencut:latest
+    restart: unless-stopped
+    environment:
+      NODE_ENV: production
+      DATABASE_URL: postgresql://opencut:${APP_SEED}@halume-opencut_db_1:5432/opencut
+      BETTER_AUTH_SECRET: ${APP_SEED}
+      UPSTASH_REDIS_REST_URL: http://halume-opencut_redis-http_1:80
+      UPSTASH_REDIS_REST_TOKEN: ${APP_SEED}
+      NEXT_PUBLIC_SITE_URL: http://${DEVICE_DOMAIN_NAME}:8462
+      NEXT_PUBLIC_MARBLE_API_URL: https://api.marblecms.com
+      MARBLE_WORKSPACE_KEY: placeholder
+      FREESOUND_CLIENT_ID: ""
+      FREESOUND_API_KEY: ""
+    depends_on:
+      db:
+        condition: service_healthy
+      redis-http:
+        condition: service_started
