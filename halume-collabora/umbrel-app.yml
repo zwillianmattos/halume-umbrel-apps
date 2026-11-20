@@ -1,0 +1,23 @@
+manifestVersion: 1
+id: halume-collabora
+category: files
+name: Halume Suite
+version: "latest"
+tagline: Editor de documentos online para o Nextcloud
+description: >-
+  Collabora Online Development Edition (CODE). Edite documentos, planilhas e
+  apresentações direto no navegador, integrado ao Nextcloud.
+developer: Collabora
+website: https://www.collaboraonline.com
+dependencies: []
+repo: https://github.com/CollaboraOnline/online
+support: https://forum.collaboraonline.com
+port: 9980
+gallery: []
+path: "/browser/dist/admin/admin.html"
+defaultUsername: "admin"
+defaultPassword: "TroqueEssaSenha"
+icon: https://raw.githubusercontent.com/SEU_USUARIO/halume-umbrel-apps/main/halume-collabora/icon.png
+submitter: Halume
+submission: ""
+releaseNotes: ""

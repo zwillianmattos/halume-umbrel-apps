@@ -1,0 +1,24 @@
+manifestVersion: 1
+id: halume-doory
+category: files
+name: Doory
+version: "0.3.1"
+tagline: Editor de design no navegador, alternativa ao Canva
+description: >-
+  Doory é um editor de design open source que roda no navegador. Crie posts,
+  stories, pôsteres, slides e cartões de visita, com edição em conjunto ao vivo
+  e exportação em PNG e PDF.
+developer: shaongitbd
+website: https://github.com/shaongitbd/doory
+dependencies: []
+repo: https://github.com/shaongitbd/doory
+support: https://github.com/shaongitbd/doory/issues
+port: 8461
+gallery: []
+path: ""
+defaultUsername: ""
+defaultPassword: ""
+icon: https://raw.githubusercontent.com/SEU_USUARIO/halume-umbrel-apps/main/halume-doory/icon.png
+submitter: Halume
+submission: ""
+releaseNotes: ""

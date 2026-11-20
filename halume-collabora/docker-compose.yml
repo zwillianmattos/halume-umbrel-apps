@@ -1,0 +1,20 @@
+version: "3.7"
+
+services:
+  app_proxy:
+    environment:
+      APP_HOST: halume-collabora_web_1
+      APP_PORT: 9980
+      PROXY_AUTH_ADD: "false"
+
+  web:
+    image: collabora/code:latest
+    restart: unless-stopped
+    cap_add:
+      - MKNOD
+    environment:
+      - aliasgroup1=http://umbrel.local:8081,http://IP_LAN_DO_SERVIDOR:8081,http://IP_TAILSCALE_DO_SERVIDOR:8081
+      - username=admin
+      - password=TroqueEssaSenha
+      - extra_params=--o:ssl.enable=false --o:ssl.termination=false
+      - dictionaries=pt_BR en_US

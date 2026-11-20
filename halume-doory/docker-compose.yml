@@ -1,0 +1,138 @@
+version: "3.7"
+
+x-doory-env: &doory-env
+  DJANGO_SETTINGS_MODULE: doory.settings.prod
+  DJANGO_SECRET_KEY: ${APP_SEED}
+  SITE_URL: http://${DEVICE_DOMAIN_NAME}:8461
+  CSRF_TRUSTED_ORIGINS: http://${DEVICE_DOMAIN_NAME}:8461,http://${DEVICE_HOSTNAME}:8461,http://IP_LAN_DO_SERVIDOR:8461,http://IP_TAILSCALE_DO_SERVIDOR:8461
+  DJANGO_ALLOWED_HOSTS: "*"
+  DATABASE_URL: postgres://doory:${APP_SEED}@halume-doory_db_1:5432/doory
+  CACHE_URL: dbcache://doory_cache
+  MEDIA_ROOT: /app/media
+  EXPORT_STORAGE_ROOT: /app/exports
+  REDIS_URL: ""
+  SECURE_SSL_REDIRECT: "false"
+  SECURE_COOKIES: "false"
+  NUM_PROXIES: "2"
+  EXPORT_RENDER_PAGE_URL: http://halume-doory-web:8080/render.html
+
+services:
+  app_proxy:
+    environment:
+      APP_HOST: halume-doory_web_1
+      APP_PORT: 8080
+      PROXY_AUTH_ADD: "false"
+
+  db:
+    image: postgres:16-alpine
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: doory
+      POSTGRES_USER: doory
+      POSTGRES_PASSWORD: ${APP_SEED}
+    volumes:
+      - ${APP_DATA_DIR}/data/postgres:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U doory -d doory"]
+      interval: 5s
+      timeout: 5s
+      retries: 12
+
+  permissions:
+    image: busybox:1.36
+    restart: "no"
+    command: ["sh", "-c", "chown -R 10001:10001 /app/media /app/exports"]
+    volumes:
+      - ${APP_DATA_DIR}/data/media:/app/media
+      - ${APP_DATA_DIR}/data/exports:/app/exports
+
+  api:
+    image: ghcr.io/shaongitbd/doory-backend:0.3.1
+    restart: unless-stopped
+    init: true
+    depends_on:
+      db:
+        condition: service_healthy
+      permissions:
+        condition: service_completed_successfully
+    security_opt:
+      - no-new-privileges:true
+    environment:
+      <<: *doory-env
+      DOORY_SYNC_ELEMENTS: "true"
+      DOORY_SYNC_FONTS: "true"
+      DOORY_SEED_TEMPLATES: "true"
+      DOORY_SYNC_AUDIO: "true"
+      DOORY_SYNC_MODELS: "true"
+    volumes:
+      - ${APP_DATA_DIR}/data/media:/app/media
+      - ${APP_DATA_DIR}/data/exports:/app/exports
+    networks:
+      default:
+        aliases: [doory-api]
+    healthcheck:
+      test: ["CMD", "python", "/app/healthcheck.py"]
+      interval: 15s
+      timeout: 5s
+      start_period: 900s
+      retries: 5
+    shm_size: "512m"
+
+  realtime:
+    image: ghcr.io/shaongitbd/doory-backend:0.3.1
+    restart: unless-stopped
+    init: true
+    mem_limit: 1g
+    depends_on:
+      api:
+        condition: service_healthy
+    security_opt:
+      - no-new-privileges:true
+    environment:
+      <<: *doory-env
+      HEALTH_PORT: "8001"
+    volumes:
+      - ${APP_DATA_DIR}/data/media:/app/media
+    networks:
+      default:
+        aliases: [doory-realtime]
+    command:
+      - uvicorn
+      - doory.asgi:application
+      - --host
+      - 0.0.0.0
+      - --port
+      - "8001"
+      - --workers
+      - "1"
+      - --ws
+      - auto
+      - --ws-max-size
+      - "2097152"
+      - --lifespan
+      - "off"
+      - --no-server-header
+      - --timeout-graceful-shutdown
+      - "20"
+    healthcheck:
+      test: ["CMD", "python", "/app/healthcheck.py"]
+      interval: 15s
+      timeout: 5s
+      start_period: 60s
+      retries: 5
+
+  web:
+    image: ghcr.io/shaongitbd/doory-frontend:0.3.1
+    restart: unless-stopped
+    security_opt:
+      - no-new-privileges:true
+    depends_on:
+      api:
+        condition: service_healthy
+      realtime:
+        condition: service_healthy
+    volumes:
+      - ${APP_DATA_DIR}/data/media:/srv/media:ro
+    networks:
+      default:
+        aliases: [halume-doory-web]
