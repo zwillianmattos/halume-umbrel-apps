@@ -1,0 +1,48 @@
+name: Build OpenCut image
+
+on:
+  workflow_dispatch:
+  push:
+    branches: [master]
+    paths:
+      - ".github/workflows/opencut-image.yml"
+
+permissions:
+  contents: read
+  packages: write
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout OpenCut
+        uses: actions/checkout@v4
+        with:
+          repository: OpenCut-app/opencut-classic
+          ref: cf5e79e919144200294fb9fed22a222592a0aeea
+
+      - name: Set up Buildx
+        uses: docker/setup-buildx-action@v3
+
+      - name: Login GHCR
+        uses: docker/login-action@v3
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Build and push
+        uses: docker/build-push-action@v6
+        with:
+          context: .
+          file: ./apps/web/Dockerfile
+          platforms: linux/amd64
+          push: true
+          build-args: |
+            NEXT_PUBLIC_MARBLE_API_URL=https://api.marblecms.com
+            MARBLE_WORKSPACE_KEY=build-placeholder
+            FREESOUND_CLIENT_ID=
+            FREESOUND_API_KEY=
+          tags: |
+            ghcr.io/zwillianmattos/halume-opencut:latest
+            ghcr.io/zwillianmattos/halume-opencut:cf5e79e

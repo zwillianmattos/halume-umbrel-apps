@@ -46,6 +46,9 @@ services:
   web:
     image: ghcr.io/zwillianmattos/halume-opencut:latest
     restart: unless-stopped
+    volumes:
+      - ${APP_DATA_DIR}/data/secrets:/secrets:ro
+    command: ["sh", "-c", "set -a; [ -f /secrets/secrets.env ] && . /secrets/secrets.env; set +a; exec bun apps/web/server.js"]
     environment:
       NODE_ENV: production
       DATABASE_URL: postgresql://opencut:${APP_SEED}@halume-opencut_db_1:5432/opencut
